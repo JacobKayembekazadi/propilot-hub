@@ -9,6 +9,13 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
+import LeadsPage from "./pages/dashboard/LeadsPage";
+import CampaignsPage from "./pages/dashboard/CampaignsPage";
+import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
+import AutomationPage from "./pages/dashboard/AutomationPage";
+import AIChatPage from "./pages/dashboard/AIChatPage";
+import SettingsPage from "./pages/dashboard/SettingsPage";
+import ProfilePage from "./pages/dashboard/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 // Layout
@@ -30,13 +37,13 @@ const App = () => (
           
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Layout><DashboardOverview /></Layout>} />
-          <Route path="/dashboard/leads" element={<Layout><div className="p-6"><h1 className="text-2xl font-bold">Leads Pipeline - Coming Soon</h1></div></Layout>} />
-          <Route path="/dashboard/campaigns" element={<Layout><div className="p-6"><h1 className="text-2xl font-bold">Campaign Manager - Coming Soon</h1></div></Layout>} />
-          <Route path="/dashboard/analytics" element={<Layout><div className="p-6"><h1 className="text-2xl font-bold">Analytics Hub - Coming Soon</h1></div></Layout>} />
-          <Route path="/dashboard/automation" element={<Layout><div className="p-6"><h1 className="text-2xl font-bold">Automation Studio - Coming Soon</h1></div></Layout>} />
-          <Route path="/dashboard/ai-chat" element={<Layout><div className="p-6"><h1 className="text-2xl font-bold">AI Copilot - Coming Soon</h1></div></Layout>} />
-          <Route path="/dashboard/settings" element={<Layout><div className="p-6"><h1 className="text-2xl font-bold">Settings - Coming Soon</h1></div></Layout>} />
-          <Route path="/dashboard/profile" element={<Layout><div className="p-6"><h1 className="text-2xl font-bold">Profile - Coming Soon</h1></div></Layout>} />
+          <Route path="/dashboard/leads" element={<Layout><LeadsPage /></Layout>} />
+          <Route path="/dashboard/campaigns" element={<Layout><CampaignsPage /></Layout>} />
+          <Route path="/dashboard/analytics" element={<Layout><AnalyticsPage /></Layout>} />
+          <Route path="/dashboard/automation" element={<Layout><AutomationPage /></Layout>} />
+          <Route path="/dashboard/ai-chat" element={<Layout><AIChatPage /></Layout>} />
+          <Route path="/dashboard/settings" element={<Layout><SettingsPage /></Layout>} />
+          <Route path="/dashboard/profile" element={<Layout><ProfilePage /></Layout>} />
           
           {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
