@@ -1,6 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Users, 
   TrendingUp, 
@@ -59,16 +62,114 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case "high": return "border-l-red-500";
-    case "medium": return "border-l-yellow-500";
-    case "low": return "border-l-green-500";
-    default: return "border-l-gray-500";
-  }
-};
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high": return "border-l-red-500";
+      case "medium": return "border-l-yellow-500";
+      case "low": return "border-l-green-500";
+      default: return "border-l-gray-500";
+    }
+  };
+
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: true })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Task completed successfully"
+      });
+
+      fetchDashboardData(); // Refresh data
+    } catch (error) {
+      console.error('Error completing task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete task",
+        variant: "destructive"
+      });
+    }
+  };
 
 export default function DashboardOverview() {
+  const { toast } = useToast();
+  const [dashboardData, setDashboardData] = useState({
+    totalLeads: 0,
+    conversionRate: 0,
+    monthlyRevenue: 0,
+    activeCampaigns: 0,
+    recentLeads: [],
+    upcomingTasks: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch leads
+      const { data: leads, error: leadsError } = await supabase
+        .from('leads')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (leadsError) throw leadsError;
+
+      // Fetch campaigns
+      const { data: campaigns, error: campaignsError } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('status', 'active');
+
+      if (campaignsError) throw campaignsError;
+
+      // Fetch tasks
+      const { data: tasks, error: tasksError } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('completed', false)
+        .order('due_date', { ascending: true })
+        .limit(4);
+
+      if (tasksError) throw tasksError;
+
+      // Calculate metrics
+      const totalLeads = leads?.length || 0;
+      const qualifiedLeads = leads?.filter(lead => lead.status === 'ai_qualified' || lead.status === 'contacted').length || 0;
+      const conversionRate = totalLeads > 0 ? (qualifiedLeads / totalLeads * 100) : 0;
+      const monthlyRevenue = campaigns?.reduce((sum, campaign) => sum + (campaign.budget || 0), 0) || 0;
+      const activeCampaigns = campaigns?.length || 0;
+
+      setDashboardData({
+        totalLeads,
+        conversionRate: Math.round(conversionRate * 10) / 10,
+        monthlyRevenue,
+        activeCampaigns,
+        recentLeads: leads?.slice(0, 5) || [],
+        upcomingTasks: tasks || []
+      });
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard data",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -96,7 +197,7 @@ export default function DashboardOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Leads</p>
-                <p className="text-2xl font-bold">341</p>
+                <p className="text-2xl font-bold">{loading ? "..." : dashboardData.totalLeads}</p>
                 <p className="text-xs text-success flex items-center mt-1">
                   <ArrowUp className="w-3 h-3 mr-1" />
                   +12% from last month
@@ -114,7 +215,7 @@ export default function DashboardOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Conversion Rate</p>
-                <p className="text-2xl font-bold">34.2%</p>
+                <p className="text-2xl font-bold">{loading ? "..." : `${dashboardData.conversionRate}%`}</p>
                 <p className="text-xs text-success flex items-center mt-1">
                   <ArrowUp className="w-3 h-3 mr-1" />
                   +5% from last month
@@ -132,7 +233,7 @@ export default function DashboardOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Revenue (MTD)</p>
-                <p className="text-2xl font-bold">$380K</p>
+                <p className="text-2xl font-bold">{loading ? "..." : `$${Math.round(dashboardData.monthlyRevenue / 1000)}K`}</p>
                 <p className="text-xs text-destructive flex items-center mt-1">
                   <ArrowDown className="w-3 h-3 mr-1" />
                   -3% from last month
@@ -150,7 +251,7 @@ export default function DashboardOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Active Campaigns</p>
-                <p className="text-2xl font-bold">8</p>
+                <p className="text-2xl font-bold">{loading ? "..." : dashboardData.activeCampaigns}</p>
                 <p className="text-xs text-success flex items-center mt-1">
                   <ArrowUp className="w-3 h-3 mr-1" />
                   2 new this week
@@ -239,31 +340,39 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentLeads.map((lead) => (
-                <div key={lead.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{lead.name}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{lead.type}</span>
-                        <span>•</span>
-                        <span>{lead.source}</span>
-                        <span>•</span>
-                        <span>Score: {lead.score}</span>
+              {loading ? (
+                <div className="text-center text-muted-foreground">Loading...</div>
+              ) : dashboardData.recentLeads.length === 0 ? (
+                <div className="text-center text-muted-foreground">No recent leads</div>
+              ) : (
+                dashboardData.recentLeads.map((lead) => (
+                  <div key={lead.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Users className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{lead.first_name} {lead.last_name}</p>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>{lead.property_type || 'Unknown'}</span>
+                          <span>•</span>
+                          <span>{lead.source}</span>
+                          <span>•</span>
+                          <span>Score: {lead.ai_score || 'N/A'}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="text-right">
+                      <Badge className={getStatusColor(lead.status)} variant="secondary">
+                        {lead.status}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(lead.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <Badge className={getStatusColor(lead.status)} variant="secondary">
-                      {lead.status}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">{lead.time}</p>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -281,26 +390,36 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {upcomingTasks.map((task) => (
-                <div key={task.id} className={`flex items-center gap-3 p-3 border-l-4 ${getPriorityColor(task.priority)} bg-muted/30 rounded-r-lg`}>
-                  <div className="w-8 h-8 bg-background rounded-full flex items-center justify-center">
-                    {task.type === "call" && <Phone className="w-4 h-4" />}
-                    {task.type === "email" && <Mail className="w-4 h-4" />}
-                    {task.type === "showing" && <Calendar className="w-4 h-4" />}
-                    {task.type === "meeting" && <MessageSquare className="w-4 h-4" />}
+              {loading ? (
+                <div className="text-center text-muted-foreground">Loading...</div>
+              ) : dashboardData.upcomingTasks.length === 0 ? (
+                <div className="text-center text-muted-foreground">No upcoming tasks</div>
+              ) : (
+                dashboardData.upcomingTasks.map((task) => (
+                  <div key={task.id} className={`flex items-center gap-3 p-3 border-l-4 ${getPriorityColor(task.priority)} bg-muted/30 rounded-r-lg`}>
+                    <div className="w-8 h-8 bg-background rounded-full flex items-center justify-center">
+                      {task.task_type === "call" && <Phone className="w-4 h-4" />}
+                      {task.task_type === "email" && <Mail className="w-4 h-4" />}
+                      {task.task_type === "showing" && <Calendar className="w-4 h-4" />}
+                      {task.task_type === "meeting" && <MessageSquare className="w-4 h-4" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{task.title}</p>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No due date'}
+                      </p>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleCompleteTask(task.id)}
+                    >
+                      Complete
+                    </Button>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{task.title}</p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {task.time}
-                    </p>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    Complete
-                  </Button>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

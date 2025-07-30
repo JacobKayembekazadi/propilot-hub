@@ -12,6 +12,7 @@ import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import LeadsPage from "./pages/dashboard/LeadsPage";
 import CampaignsPage from "./pages/dashboard/CampaignsPage";
 import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
+import TasksPage from "./pages/dashboard/TasksPage";
 import AutomationPage from "./pages/dashboard/AutomationPage";
 import AIChatPage from "./pages/dashboard/AIChatPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/dashboard/leads" element={<Layout><LeadsPage /></Layout>} />
           <Route path="/dashboard/campaigns" element={<Layout><CampaignsPage /></Layout>} />
           <Route path="/dashboard/analytics" element={<Layout><AnalyticsPage /></Layout>} />
+          <Route path="/dashboard/tasks" element={<Layout><TasksPage /></Layout>} />
           <Route path="/dashboard/automation" element={<Layout><AutomationPage /></Layout>} />
           <Route path="/dashboard/ai-chat" element={<Layout><AIChatPage /></Layout>} />
           <Route path="/dashboard/settings" element={<Layout><SettingsPage /></Layout>} />

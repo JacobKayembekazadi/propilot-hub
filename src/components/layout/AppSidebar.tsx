@@ -9,9 +9,11 @@ import {
   MessageSquare,
   Home,
   User,
-  LogOut
+  LogOut,
+  CheckSquare
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 import {
   Sidebar,
@@ -31,6 +33,7 @@ const mainItems = [
   { title: "Leads", url: "/dashboard/leads", icon: Users },
   { title: "Campaigns", url: "/dashboard/campaigns", icon: Megaphone },
   { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+  { title: "Tasks", url: "/dashboard/tasks", icon: CheckSquare },
   { title: "Automation", url: "/dashboard/automation", icon: Zap },
   { title: "AI Copilot", url: "/dashboard/ai-chat", icon: MessageSquare },
 ];
@@ -117,7 +120,10 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <button 
-                    onClick={() => {/* Handle logout */}}
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      window.location.href = '/';
+                    }}
                     className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-destructive text-muted-foreground hover:bg-destructive/10 w-full text-left"
                   >
                     <LogOut className="w-5 h-5" />
