@@ -85,11 +85,18 @@ export default function TasksPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    due_date: string;
+    priority: Task['priority'];
+    task_type: string;
+    lead_id: string;
+  }>({
     title: "",
     description: "",
     due_date: "",
-    priority: "medium" as const,
+    priority: "medium",
     task_type: "",
     lead_id: ""
   });

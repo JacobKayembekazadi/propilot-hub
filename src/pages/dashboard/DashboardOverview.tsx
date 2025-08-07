@@ -71,30 +71,6 @@ const getStatusColor = (status: string) => {
     }
   };
 
-  const handleCompleteTask = async (taskId: string) => {
-    try {
-      const { error } = await supabase
-        .from('tasks')
-        .update({ completed: true })
-        .eq('id', taskId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Task completed successfully"
-      });
-
-      fetchDashboardData(); // Refresh data
-    } catch (error) {
-      console.error('Error completing task:', error);
-      toast({
-        title: "Error",
-        description: "Failed to complete task",
-        variant: "destructive"
-      });
-    }
-  };
 
 export default function DashboardOverview() {
   const { toast } = useToast();
@@ -167,6 +143,31 @@ export default function DashboardOverview() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCompleteTask = async (taskId: string) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: true })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Task completed successfully"
+      });
+
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error completing task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete task",
+        variant: "destructive"
+      });
     }
   };
 
