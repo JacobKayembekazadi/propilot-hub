@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
+import { Link } from "react-router-dom";
 interface Lead {
   id: string;
   name: string;
@@ -173,6 +173,35 @@ export default function LeadsPage() {
     closed_won: leads.filter(l => l.status === 'closed_won').length
   };
 
+  const exportCSV = () => {
+    const headers = [
+      'Name','Email','Phone','Status','Source','Budget Range','Property Interest','Created At'
+    ];
+    const rows = filteredLeads.map(l => [
+      l.name,
+      l.email,
+      l.phone || '',
+      l.status,
+      l.lead_source || '',
+      l.budget_range || '',
+      l.property_interest || '',
+      new Date(l.created_at).toISOString()
+    ]);
+
+    const csv = [headers, ...rows]
+      .map(r => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'leads.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -181,6 +210,9 @@ export default function LeadsPage() {
           <p className="text-muted-foreground">Manage your real estate leads and track conversions</p>
         </div>
         
+        <Link to="/dashboard/leads/kanban">
+          <Button variant="outline" className="mr-2">Kanban View</Button>
+        </Link>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => {resetForm(); setEditingLead(null);}}>
@@ -367,6 +399,7 @@ export default function LeadsPage() {
             <SelectItem value="closed_lost">Closed Lost</SelectItem>
           </SelectContent>
         </Select>
+        <Button variant="outline" onClick={exportCSV}>Export CSV</Button>
       </div>
 
       {/* Leads Table */}

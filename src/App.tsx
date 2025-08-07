@@ -10,6 +10,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import LeadsPage from "./pages/dashboard/LeadsPage";
+import LeadsKanbanPage from "./pages/dashboard/LeadsKanbanPage";
 import CampaignsPage from "./pages/dashboard/CampaignsPage";
 import AnalyticsPage from "./pages/dashboard/AnalyticsPage";
 import TasksPage from "./pages/dashboard/TasksPage";
@@ -39,6 +40,7 @@ const App = () => (
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Layout><DashboardOverview /></Layout>} />
           <Route path="/dashboard/leads" element={<Layout><LeadsPage /></Layout>} />
+          <Route path="/dashboard/leads/kanban" element={<Layout><LeadsKanbanPage /></Layout>} />
           <Route path="/dashboard/campaigns" element={<Layout><CampaignsPage /></Layout>} />
           <Route path="/dashboard/analytics" element={<Layout><AnalyticsPage /></Layout>} />
           <Route path="/dashboard/tasks" element={<Layout><TasksPage /></Layout>} />
