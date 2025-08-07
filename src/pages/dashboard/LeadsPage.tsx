@@ -39,7 +39,7 @@ export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const { toast } = useToast();
@@ -162,7 +162,7 @@ export default function LeadsPage() {
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          lead.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = !statusFilter || lead.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || lead.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -358,7 +358,7 @@ export default function LeadsPage() {
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="new">New</SelectItem>
             <SelectItem value="contacted">Contacted</SelectItem>
             <SelectItem value="qualified">Qualified</SelectItem>

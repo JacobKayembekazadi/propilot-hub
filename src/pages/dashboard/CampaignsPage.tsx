@@ -46,7 +46,7 @@ export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const { toast } = useToast();
@@ -168,7 +168,7 @@ export default function CampaignsPage() {
 
   const filteredCampaigns = campaigns.filter(campaign => {
     const matchesSearch = campaign.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = !statusFilter || campaign.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -370,7 +370,7 @@ export default function CampaignsPage() {
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="paused">Paused</SelectItem>

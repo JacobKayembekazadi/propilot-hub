@@ -359,12 +359,15 @@ export default function TasksPage() {
 
               <div>
                 <Label htmlFor="lead_id">Related Lead</Label>
-                <Select value={formData.lead_id} onValueChange={(value) => setFormData({...formData, lead_id: value})}>
+                <Select
+                  value={formData.lead_id}
+                  onValueChange={(value) => setFormData({ ...formData, lead_id: value === 'none' ? '' : value })}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a lead (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No lead</SelectItem>
+                    <SelectItem value="none">No lead</SelectItem>
                     {leads.map((lead) => (
                       <SelectItem key={lead.id} value={lead.id}>
                         {lead.first_name} {lead.last_name}
