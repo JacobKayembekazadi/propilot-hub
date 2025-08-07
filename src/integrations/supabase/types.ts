@@ -10,11 +10,201 @@ export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
-      [_ in never]: never
+      automation_workflows: {
+        Row: {
+          actions: Json
+          created_at: string
+          description: string | null
+          execution_count: number
+          id: string
+          is_active: boolean
+          last_executed: string | null
+          name: string
+          trigger_conditions: Json
+          trigger_type: Database["public"]["Enums"]["workflow_trigger"]
+          updated_at: string
+        }
+        Insert: {
+          actions?: Json
+          created_at?: string
+          description?: string | null
+          execution_count?: number
+          id?: string
+          is_active?: boolean
+          last_executed?: string | null
+          name: string
+          trigger_conditions?: Json
+          trigger_type?: Database["public"]["Enums"]["workflow_trigger"]
+          updated_at?: string
+        }
+        Update: {
+          actions?: Json
+          created_at?: string
+          description?: string | null
+          execution_count?: number
+          id?: string
+          is_active?: boolean
+          last_executed?: string | null
+          name?: string
+          trigger_conditions?: Json
+          trigger_type?: Database["public"]["Enums"]["workflow_trigger"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      campaigns: {
+        Row: {
+          budget: number | null
+          created_at: string
+          end_date: string | null
+          goals: string | null
+          id: string
+          metrics: Json | null
+          name: string
+          start_date: string | null
+          status: Database["public"]["Enums"]["campaign_status"]
+          target_audience: string | null
+          type: Database["public"]["Enums"]["campaign_type"]
+          updated_at: string
+        }
+        Insert: {
+          budget?: number | null
+          created_at?: string
+          end_date?: string | null
+          goals?: string | null
+          id?: string
+          metrics?: Json | null
+          name: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"]
+          target_audience?: string | null
+          type?: Database["public"]["Enums"]["campaign_type"]
+          updated_at?: string
+        }
+        Update: {
+          budget?: number | null
+          created_at?: string
+          end_date?: string | null
+          goals?: string | null
+          id?: string
+          metrics?: Json | null
+          name?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["campaign_status"]
+          target_audience?: string | null
+          type?: Database["public"]["Enums"]["campaign_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          ai_score: number | null
+          budget_range: string | null
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          lead_source: string | null
+          name: string | null
+          notes: string | null
+          phone: string | null
+          property_interest: string | null
+          property_type: string | null
+          source: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          updated_at: string
+        }
+        Insert: {
+          ai_score?: number | null
+          budget_range?: string | null
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          lead_source?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          property_interest?: string | null
+          property_type?: string | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Update: {
+          ai_score?: number | null
+          budget_range?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          lead_source?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          property_interest?: string | null
+          property_type?: string | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          completed: boolean
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          lead_id: string | null
+          priority: Database["public"]["Enums"]["task_priority"]
+          task_type: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          task_type?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: Database["public"]["Enums"]["task_priority"]
+          task_type?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +213,22 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      campaign_status: "draft" | "active" | "paused" | "completed"
+      campaign_type: "email" | "social" | "ppc" | "content" | "event"
+      lead_status:
+        | "new"
+        | "contacted"
+        | "qualified"
+        | "proposal"
+        | "closed_won"
+        | "closed_lost"
+      task_priority: "low" | "medium" | "high" | "urgent"
+      workflow_trigger:
+        | "new_lead"
+        | "lead_status_change"
+        | "scheduled"
+        | "email_opened"
+        | "form_submitted"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +355,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      campaign_status: ["draft", "active", "paused", "completed"],
+      campaign_type: ["email", "social", "ppc", "content", "event"],
+      lead_status: [
+        "new",
+        "contacted",
+        "qualified",
+        "proposal",
+        "closed_won",
+        "closed_lost",
+      ],
+      task_priority: ["low", "medium", "high", "urgent"],
+      workflow_trigger: [
+        "new_lead",
+        "lead_status_change",
+        "scheduled",
+        "email_opened",
+        "form_submitted",
+      ],
+    },
   },
 } as const
