@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import AutomationBuilder from "@/components/automation/AutomationBuilder";
 
 interface AutomationWorkflow {
   id: string;
@@ -50,7 +51,8 @@ export default function AutomationPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingWorkflow, setEditingWorkflow] = useState<AutomationWorkflow | null>(null);
-  const { toast } = useToast();
+const { toast } = useToast();
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -285,6 +287,15 @@ export default function AutomationPage() {
                 </Button>
               </div>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        <Button variant="outline" onClick={() => setIsBuilderOpen(true)}>
+          Visual Builder
+        </Button>
+        <Dialog open={isBuilderOpen} onOpenChange={setIsBuilderOpen}>
+          <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0">
+            <AutomationBuilder onClose={() => setIsBuilderOpen(false)} onSaved={() => { setIsBuilderOpen(false); fetchWorkflows(); }} />
           </DialogContent>
         </Dialog>
       </div>
